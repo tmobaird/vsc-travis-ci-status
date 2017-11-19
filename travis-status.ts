@@ -1,6 +1,7 @@
 import { window, commands, StatusBarAlignment, StatusBarItem, workspace, extensions } from 'vscode';
 import path = require('path');
 import fs = require('fs');
+import ResultColors from './result-colors';
 
 var Travis = require('travis-ci');
 var Git = require('git-rev-2');
@@ -146,32 +147,33 @@ export default class TravisStatusIndicator {
 
 	// Setup status bar item to display that this plugin is in trouble
 	private displayError(err: string, identifier?: string): void {
-		this.setupStatusBarItem(err, 'stop', identifier);
+		this.setupStatusBarItem(err, 'stop', ResultColors.failed, identifier);
 	}
 
 	// Setup status bar item to display that the build has passed;
 	private displaySuccess(text: string, identifier?: string): void {
-		this.setupStatusBarItem(text, 'check', identifier);
+		this.setupStatusBarItem(text, 'check', ResultColors.passed, identifier);
 	}
 
 	// Setup status bar item to display that the build has failed;
 	private displayFailure(text: string, identifier?: string): void {
-		this.setupStatusBarItem(text, 'x', identifier);
+		this.setupStatusBarItem(text, 'x', ResultColors.failed, identifier);
 	}
 
 	// Setup status bar item to display that the build is running;
 	private displayRunning(text: string, identifier?: string): void {
-		this.setupStatusBarItem(text, 'clock', identifier);
+		this.setupStatusBarItem(text, 'clock', ResultColors.running, identifier);
 	}
 
 	// Setup StatusBarItem with an icon and a tooltip
-	private setupStatusBarItem(tooltip: string, icon: string, identifier?: string): void {
+	private setupStatusBarItem(tooltip: string, icon: string, color: string, identifier?: string): void {
 		if (!this._statusBarItem) {
 			this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
 		}
 
 		this._statusBarItem.text = identifier ? `Travis CI ${identifier} $(${icon})` : `Travis CI $(${icon})`;
 		this._statusBarItem.tooltip = tooltip;
+		this._statusBarItem.color = color;
 		this._statusBarItem.show();
 	}
 
